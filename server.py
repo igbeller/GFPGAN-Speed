@@ -11,12 +11,10 @@ import base64
 '''
 {
     "workflow" : "img",
-    "payload": {
-        "base64" : "<string>",
-        "weight" : 0.5,
-        "only_center_face": false,
-        "aligned": false
-    }
+    "base64" : "<string>",
+    "weight" : 0.5,
+    "only_center_face": false,
+    "aligned": false
 }
 '''
 
@@ -30,9 +28,8 @@ def process_data(input_queue):
         data = input_queue.get()
         if data == STOP:
             break
-        payload = data["payload"]
         print(f"data: {data}")
-        base_64 = payload["base64"]
+        base_64 = data["base64"]
         gan_id = data[KEY_ID]
         vid_path = os.path.join("inputs/vids", f"{gan_id}.mp4")
         import processor
@@ -73,7 +70,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         json_data[KEY_ID] = str(uuid.uuid4())
 
         self.server.server_queue.put(json_data)
-        self.respond(200, {KEY_ID:  json_data[KEY_ID] })
+        self.respond(200, {KEY_ID: json_data[KEY_ID]})
 
 
     def respond(self, code, json_content):
