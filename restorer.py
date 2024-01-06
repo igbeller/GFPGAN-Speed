@@ -27,6 +27,9 @@ restorer = GFPGANer(
     channel_multiplier=channel_multiplier,
     bg_upsampler=bg_upsampler)
 
+
+RESTORED_DIR_NAMME = "restored_imgs"
+
 def restore(arg_input="inputs/tmp_frames", output_dir="results"):
     """Inference demo for GFPGAN (for users).
     """
@@ -47,7 +50,7 @@ def restore(arg_input="inputs/tmp_frames", output_dir="results"):
     pool = ctx.Pool(7)
     pool.map(restore_mul, img_list)
 
-    return output_dir
+    return os.path.join(output_dir, RESTORED_DIR_NAMME)
 
 
 def restore_mul(img_path, output_dir, arg_ext="auto", weight=0.5, only_center_face=False, aligned=False):
@@ -71,7 +74,7 @@ def restore_mul(img_path, output_dir, arg_ext="auto", weight=0.5, only_center_fa
             else:
                 extension = arg_ext
 
-            save_restore_path = os.path.join(output_dir, 'restored_imgs', f'{basename}.{extension}')
+            save_restore_path = os.path.join(output_dir, RESTORED_DIR_NAMME, f'{basename}.{extension}')
             imwrite(restored_img, save_restore_path)
 
 
