@@ -13,7 +13,7 @@ class Result:
         self.error = error
 
     def __repr__(self):
-        return f"Result(success={self.success}, data={self.data}, error={self.error})
+        return f"Result(success={self.success}, data={self.data}, error={self.error})"
 
 def err(r):
     return f"ERROR: {r}"
