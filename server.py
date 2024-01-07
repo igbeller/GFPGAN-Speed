@@ -24,18 +24,46 @@ ENCODING = 'utf-8'
 STOP = "STOP"
 
 def process_data(input_queue):
+    print(f"GFPGAN start process_data")
     while True:
         data = input_queue.get()
         if data == STOP:
             break
-        print(f"data: {data}")
+
         base_64 = data["base64"]
         gan_id = data[KEY_ID]
         vid_path = os.path.join("inputs/vids", f"{gan_id}.mp4")
+
         import processor
         out_path = processor.run(base_64, vid_path, vid_name=gan_id)
-        print(f"id: {id} processed to: {out_path}")
 
+        if "ERROR:" in out_path:
+            os.makedirs(ERR_DIR, exist_ok=True)
+            _write_error_to_file(f"{id} {out_path}", _err_file_path)
+            print(f"ERROR id: {id} wrote error: {out_path} to {_err_file_path}")
+        else:
+            print(f"id: {id} processed to: {out_path}")
+
+
+
+def _errfn(gan_id):
+    return f"error_{gan_id}.txt"
+
+
+ERR_DIR = "errors"
+
+
+def _err_file_path(gan_id):
+    return os.path.join(ERR_DIR, _errfn(gan_id))
+
+
+def _write_error_to_file(error_message, err_file_path):
+    try:
+        with open(err_file_path, "w") as error_file:
+            error_file.write(error_message)
+
+    except Exception as e:
+        print(f"Failed to write to error file {err_file_path}: {e}")
 
 
 def _video_to_base64(file_path):
@@ -69,6 +97,8 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         json_data[KEY_ID] = str(uuid.uuid4())
 
+        print(f"post request, gan_id: {json_data[KEY_ID]}")
+
         self.server.server_queue.put(json_data)
         self.respond(200, {KEY_ID: json_data[KEY_ID]})
 
@@ -82,13 +112,18 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(bytes(response_json, ENCODING))
 
     def handle_get(self):
-        print(f"get: {self.path}")
         if "/get/" in self.path:
             return self._get_gan_output(self.path.split("/")[-1])
         return {"get": "hi"}
 
     def _get_gan_output(self, gan_id):
         file_path = os.path.join("results", gan_id)
+
+        if os.path.exists(_err_file_path(gan_id)):
+            with open(file_path, 'r') as file:
+                content = file.read()
+                return {KEY_ID: gan_id, "error": content}
+
         if not os.path.exists(file_path):
             return {KEY_ID: gan_id}
         else:
@@ -105,6 +140,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
 def start_server(server_queue):
     server_address = ('127.0.0.1', 8080)
+    print(f"GFPGAN start_server on {server_address}")
     http_server = HTTPServer(server_address, RequestHandler)
     http_server.server_queue = server_queue
     http_server.serve_forever()
