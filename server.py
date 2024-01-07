@@ -33,14 +33,15 @@ def process_data(input_queue):
         base_64 = data["base64"]
         gan_id = data[KEY_ID]
         vid_path = os.path.join("inputs/vids", f"{gan_id}.mp4")
+        os.makedirs("inputs/vids", exist_ok=True)
 
         import processor
         out_path = processor.run(base_64, vid_path, vid_name=gan_id)
 
         if "ERROR:" in out_path:
             os.makedirs(ERR_DIR, exist_ok=True)
-            _write_error_to_file(f"{id} {out_path}", _err_file_path)
-            print(f"ERROR id: {id} wrote error: {out_path} to {_err_file_path}")
+            _write_error_to_file(f"{id} {out_path}", _err_file_path(gan_id))
+            print(f"ERROR id: {id} wrote error: {out_path} to {_err_file_path(gan_id)}")
         else:
             print(f"id: {id} processed to: {out_path}")
 
