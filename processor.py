@@ -42,11 +42,10 @@ def run(base_64, vid_path, vid_name="output_vid"):
         if not output_vid.success:
             return err(output_vid)
 
-        print(f"[GFPGAN] DONE -> {output_vid}")
-
         result = _sanity_check_video(output_vid.data)
         print(f"[GFPGAN] vid sanity check: {result}")
 
+        print(f"[GFPGAN] DONE -> {output_vid}")
         return output_vid.data
     except Exception as e:
         print(f"[GFPGAN] FAILED TO PROCESS DATA with exception: {e}")
