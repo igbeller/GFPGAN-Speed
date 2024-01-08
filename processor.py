@@ -22,22 +22,27 @@ def run(base_64, vid_path, vid_name="output_vid"):
     try:
         _delete_tmp()
 
+        print("_decode_b64...")
         decode_result = _decode_b64(base_64, vid_path)
         if not decode_result.success:
             return err(decode_result)
 
+        print(f"_split_vid_into_frames {vid_path}")
         frames_dir = _split_vid_into_frames(vid_path)
         if not frames_dir.success:
             return err(frames_dir)
 
+        print(f"_gfpgan {frames_dir.data}")
         gan_result = _gfpgan(frames_dir.data)
         if not gan_result.success:
             return err(gan_result)
 
+        print(f"_merge_frames_into_vid {vid_path.data} -> {vid_name}")
         output_vid = _merge_frames_into_vid(vid_path, vid_name)
         if not output_vid.success:
             return err(output_vid)
 
+        print(f"DONE -> {output_vid.data}")
         return output_vid.data
     except Exception as e:
         print(f"FAILED TO PROCESS DATA with exception: {e}")
@@ -79,13 +84,13 @@ def _split_vid_into_frames(input_video):
     output_pattern = f"{out_dir}/frame%08d.jpg"
     ffmpeg_command = [
         'ffmpeg',
+        "-hide_banner",
+        "-loglevel", "error",
         '-i', input_video,
         '-qscale:v', '1',
         '-qmin', '1',
         '-qmax', '1',
         '-vsync', '0',
-        "-hide_banner",
-        "-loglevel", "error",
         output_pattern
     ]
     try:
@@ -107,20 +112,19 @@ def _gfpgan(input_frames_dir):
 def _merge_frames_into_vid(input_video, vid_name):
     input_pattern = "results/restored_imgs/frame%08d.jpg"
     out_dir = "results/vids"
-    os.makedirs(out_dir)
+    os.makedirs(out_dir, exist_ok=True)
     output_video = os.path.join(out_dir, f"{vid_name}.mp4")
 
     ffmpeg_command = [
         'ffmpeg',
+        "-hide_banner",
+        "-loglevel", "error",
         '-framerate', '30',
         '-i', input_pattern,
         '-i', input_video,
         '-c:v', 'libx264',
         '-pix_fmt', 'yuv420p',
-        '-c:a', 'copy',
-        "-hide_banner",
-        "-loglevel", "error",
-        output_video
+        '-c:a', 'copy', output_video
     ]
     try:
         subprocess.run(ffmpeg_command, check=True)

@@ -71,8 +71,8 @@ def _video_to_base64(file_path):
     try:
         with open(file_path, 'rb') as video_file:
             video_binary = video_file.read()
-            base64_encoded = base64.b64encode(video_binary).decode(ENCODING)
-            return base64_encoded
+            base64_encoded = base64.b64encode(video_binary)
+            return base64_encoded.decode(ENCODING)
     except Exception as e:
         print(f"Error: {e}")
         return None
@@ -121,7 +121,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         file_path = os.path.join("results/vids", f"{gan_id}.mp4")
 
         err_path = _err_file_path(gan_id)
-        print(f"err_path: {err_path} exists: {os.path.exists(err_path)}")
         if os.path.exists(err_path):
             with open(err_path, 'r') as file:
                 content = file.read()

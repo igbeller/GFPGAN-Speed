@@ -64,7 +64,6 @@ def restore_mul(inputData: RestoreInput, arg_ext="auto", weight=0.5, only_center
     # read image
     img_path = inputData.img_path
     img_name = os.path.basename(img_path)
-    print(f'Processing {img_name} ...')
     basename, ext = os.path.splitext(img_name)
     input_img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 
