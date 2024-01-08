@@ -40,10 +40,10 @@ def process_data(input_queue):
 
         if "ERROR:" in out_path:
             os.makedirs(ERR_DIR, exist_ok=True)
-            _write_error_to_file(f"{id} {out_path}", _err_file_path(gan_id))
-            print(f"ERROR id: {id} wrote error: {out_path} to {_err_file_path(gan_id)}")
+            _write_error_to_file(f"{gan_id} {out_path}", _err_file_path(gan_id))
+            print(f"ERROR id: {gan_id} wrote error: {out_path} to {_err_file_path(gan_id)}")
         else:
-            print(f"id: {id} processed to: {out_path}")
+            print(f"id: {gan_id} processed to: {out_path}")
 
 
 

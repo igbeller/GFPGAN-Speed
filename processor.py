@@ -58,8 +58,9 @@ def _delete_contents(directory_path):
 
 def _decode_b64(base_64, out_path):
     try:
+        directory = os.path.dirname(out_path)
+        os.makedirs(directory, exist_ok=True)
         video_data = base64.b64decode(base_64)
-        os.makedirs(out_path, exist_ok=True)
         with open(out_path, 'wb') as output_file:
             output_file.write(video_data)
         print(f"Conversion successful. file saved at {out_path}")
