@@ -71,8 +71,9 @@ def _video_to_base64(file_path):
     try:
         with open(file_path, 'rb') as video_file:
             video_binary = video_file.read()
+            print(f"_video_to_base64 {file_path} -> video_binary len: {len(video_binary)}")
             base64_encoded = base64.urlsafe_b64encode(video_binary)
-            print(f"_video_to_base64 Base64-encoded string: {len(base64_encoded)}")
+            print(f"_video_to_base64 {file_path} -> encoded bytes len: {len(base64_encoded)}")
             return base64_encoded.decode(ENCODING)
     except Exception as e:
         print(f"Error: {e}")
