@@ -48,34 +48,42 @@ def restore(arg_input="inputs/tmp_frames", output_dir="results"):
     # ------------------------ restore ------------------------
     ctx = torch.multiprocessing.get_context("spawn")
     pool = ctx.Pool(7)
-    pool.map(restore_mul, img_list)
+    
+    input_list = [RestoreInput(img_path, output_dir) for img_path in img_list]
+    pool.map(restore_mul, input_list)
 
     return os.path.join(output_dir, RESTORED_DIR_NAMME)
 
+class RestoreInput:
+    def __init__(self, img_path, output_dir):
+        self.img_path = img_path
+        self.output_dir = output_dir
 
-def restore_mul(img_path, output_dir, arg_ext="auto", weight=0.5, only_center_face=False, aligned=False):
-        # read image
-        img_name = os.path.basename(img_path)
-        print(f'Processing {img_name} ...')
-        basename, ext = os.path.splitext(img_name)
-        input_img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 
-        # restore faces and background if necessary
-        cropped_faces, restored_faces, restored_img = restorer.enhance(
-            input_img,
-            has_aligned=aligned,
-            only_center_face=only_center_face,
-            paste_back=True,
-            weight=weight)
-        # save restored img
-        if restored_img is not None:
-            if arg_ext == 'auto':
-                extension = ext[1:]
-            else:
-                extension = arg_ext
+def restore_mul(inputData: RestoreInput, arg_ext="auto", weight=0.5, only_center_face=False, aligned=False):
+    # read image
+    img_path = inputData.img_path
+    img_name = os.path.basename(img_path)
+    print(f'Processing {img_name} ...')
+    basename, ext = os.path.splitext(img_name)
+    input_img = cv2.imread(img_path, cv2.IMREAD_COLOR)
 
-            save_restore_path = os.path.join(output_dir, RESTORED_DIR_NAMME, f'{basename}.{extension}')
-            imwrite(restored_img, save_restore_path)
+    # restore faces and background if necessary
+    cropped_faces, restored_faces, restored_img = restorer.enhance(
+        input_img,
+        has_aligned=aligned,
+        only_center_face=only_center_face,
+        paste_back=True,
+        weight=weight)
+    # save restored img
+    if restored_img is not None:
+        if arg_ext == 'auto':
+            extension = ext[1:]
+        else:
+            extension = arg_ext
+
+        save_restore_path = os.path.join(inputData.output_dir, RESTORED_DIR_NAMME, f'{basename}.{extension}')
+        imwrite(restored_img, save_restore_path)
 
 
 
