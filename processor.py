@@ -22,30 +22,30 @@ def run(base_64, vid_path, vid_name="output_vid"):
     try:
         _delete_tmp()
 
-        print("_decode_b64...")
+        print("[GFPGAN] _decode_b64...")
         decode_result = _decode_b64(base_64, vid_path)
         if not decode_result.success:
             return err(decode_result)
 
-        print(f"_split_vid_into_frames {vid_path}")
+        print(f"[GFPGAN] _split_vid_into_frames {vid_path}")
         frames_dir = _split_vid_into_frames(vid_path)
         if not frames_dir.success:
             return err(frames_dir)
 
-        print(f"_gfpgan {frames_dir.data}")
+        print(f"[GFPGAN] _gfpgan {frames_dir}")
         gan_result = _gfpgan(frames_dir.data)
         if not gan_result.success:
             return err(gan_result)
 
-        print(f"_merge_frames_into_vid {vid_path.data} -> {vid_name}")
+        print(f"[GFPGAN] _merge_frames_into_vid {gan_result.data} -> {vid_name}")
         output_vid = _merge_frames_into_vid(vid_path, vid_name)
         if not output_vid.success:
             return err(output_vid)
 
-        print(f"DONE -> {output_vid.data}")
+        print(f"[GFPGAN] DONE -> {output_vid}")
         return output_vid.data
     except Exception as e:
-        print(f"FAILED TO PROCESS DATA with exception: {e}")
+        print(f"[GFPGAN] FAILED TO PROCESS DATA with exception: {e}")
         return err(e)
 
 
@@ -71,7 +71,6 @@ def _decode_b64(base_64, out_path):
         video_data = base64.b64decode(base_64)
         with open(out_path, 'wb') as output_file:
             output_file.write(video_data)
-        print(f"Conversion successful. file saved at {out_path}")
         return Result(data=out_path)
     except Exception as e:
         return Result(success=False, error=f"Error during _decode_b64: {e}")
