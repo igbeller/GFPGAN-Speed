@@ -20,6 +20,8 @@ def err(r):
 
 def run(base_64, vid_path, vid_name="output_vid"):
     try:
+        os.makedirs(tmp_frames_path, exist_ok=True)
+        os.makedirs(restored_imgs_path, exist_ok=True)
         _delete_tmp()
         decode_result = _decode_b64(base_64, vid_path)
         if not decode_result.success:
@@ -103,7 +105,10 @@ def _gfpgan(input_frames_dir):
 
 def _merge_frames_into_vid(input_video, vid_name):
     input_pattern = "results/restored_imgs/frame%08d.jpg"
-    output_video = f"{vid_name}.mp4"
+    out_dir = "results/vids"
+    os.makedirs(out_dir)
+    output_video = os.path.join(out_dir, f"{vid_name}.mp4")
+    
     ffmpeg_command = [
         'ffmpeg',
         '-framerate', '30',

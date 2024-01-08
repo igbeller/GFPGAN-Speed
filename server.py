@@ -120,8 +120,9 @@ class RequestHandler(BaseHTTPRequestHandler):
     def _get_gan_output(self, gan_id):
         file_path = os.path.join("results", gan_id)
 
-        if os.path.exists(_err_file_path(gan_id)):
-            with open(file_path, 'r') as file:
+        err_path = _err_file_path(gan_id)
+        if os.path.exists(err_path):
+            with open(err_path, 'r') as file:
                 content = file.read()
                 return {KEY_ID: gan_id, "error": content}
 
