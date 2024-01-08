@@ -118,7 +118,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         return {"get": "hi"}
 
     def _get_gan_output(self, gan_id):
-        file_path = os.path.join("results", gan_id)
+        file_path = os.path.join("results/vids", f"{gan_id}.mp4")
 
         err_path = _err_file_path(gan_id)
         print(f"err_path: {err_path} exists: {os.path.exists(err_path)}")

@@ -48,7 +48,7 @@ def restore(arg_input="inputs/tmp_frames", output_dir="results"):
     # ------------------------ restore ------------------------
     ctx = torch.multiprocessing.get_context("spawn")
     pool = ctx.Pool(7)
-    
+
     input_list = [RestoreInput(img_path, output_dir) for img_path in img_list]
     pool.map(restore_mul, input_list)
 
