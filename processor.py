@@ -43,6 +43,10 @@ def run(base_64, vid_path, vid_name="output_vid"):
             return err(output_vid)
 
         print(f"[GFPGAN] DONE -> {output_vid}")
+
+        result = _sanity_check_video(output_vid.data)
+        print(f"[GFPGAN] vid sanity check: {result}")
+
         return output_vid.data
     except Exception as e:
         print(f"[GFPGAN] FAILED TO PROCESS DATA with exception: {e}")
@@ -130,3 +134,26 @@ def _merge_frames_into_vid(input_video, vid_name):
         return Result(data=output_video)
     except subprocess.CalledProcessError as e:
         return Result(success=False, data=f"Error during _merge_frames_into_vid: {e}")
+
+
+def _sanity_check_video(file_path):
+    try:
+        # Run FFmpeg command to check video integrity
+        command = [
+            'ffmpeg',
+            '-v', 'error',
+            '-i', file_path,
+            '-f', 'null', '-'
+        ]
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
+
+        # Check if the output contains any error messages
+        if 'error' in result.stderr.lower():
+            return f"Error detected in video: {result.stderr}"
+        else:
+            return "Video is valid."
+
+    except subprocess.CalledProcessError as e:
+        return f"Error running FFmpeg command: {e}"
+    except Exception as e:
+        return f"An unexpected error occurred: {e}"
