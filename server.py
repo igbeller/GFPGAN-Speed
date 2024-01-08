@@ -121,9 +121,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         file_path = os.path.join("results", gan_id)
 
         err_path = _err_file_path(gan_id)
+        print(f"err_path: {err_path} exists: {os.path.exists(err_path)}")
         if os.path.exists(err_path):
             with open(err_path, 'r') as file:
                 content = file.read()
+                print(f"return error: {content}")
                 return {KEY_ID: gan_id, "error": content}
 
         if not os.path.exists(file_path):

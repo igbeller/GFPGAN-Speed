@@ -20,9 +20,8 @@ def err(r):
 
 def run(base_64, vid_path, vid_name="output_vid"):
     try:
-        os.makedirs(tmp_frames_path, exist_ok=True)
-        os.makedirs(restored_imgs_path, exist_ok=True)
         _delete_tmp()
+
         decode_result = _decode_b64(base_64, vid_path)
         if not decode_result.success:
             return err(decode_result)
@@ -48,6 +47,8 @@ def run(base_64, vid_path, vid_name="output_vid"):
 def _delete_tmp():
     _delete_contents(tmp_frames_path)
     _delete_contents(restored_imgs_path)
+    os.makedirs(tmp_frames_path, exist_ok=True)
+    os.makedirs(restored_imgs_path, exist_ok=True)
 
 def _delete_contents(directory_path):
     try:
@@ -108,7 +109,7 @@ def _merge_frames_into_vid(input_video, vid_name):
     out_dir = "results/vids"
     os.makedirs(out_dir)
     output_video = os.path.join(out_dir, f"{vid_name}.mp4")
-    
+
     ffmpeg_command = [
         'ffmpeg',
         '-framerate', '30',
