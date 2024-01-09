@@ -1,7 +1,6 @@
 basicsr>=1.4.2
 facexlib>=0.2.5
 lmdb
-numpy
 opencv-python
 pyyaml
 scipy
@@ -12,3 +11,4 @@ tqdm
 yapf
 imageio
 moviepy
+numpy
