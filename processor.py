@@ -3,6 +3,7 @@ import base64
 import os
 import shutil
 import subprocess
+import vid_helper
 
 TMP_FRAMES_DIR = "inputs/tmp_frames"
 restored_imgs_path = "results/restored_imgs"
@@ -86,8 +87,7 @@ def _decode_b64(base_64, out_path):
 
 def _split_vid_into_frames(input_video):
     try:
-        import extract_frames
-        out_folder = extract_frames.extract_frames(input_video, TMP_FRAMES_DIR, target_fps=30)
+        out_folder = vid_helper.extract_frames(input_video, TMP_FRAMES_DIR, target_fps=30)
         if out_folder is None:
             return Result(success=False, error=f"_split_vid_into_frames: couldn't open video file")
         return Result(data=out_folder)
@@ -124,11 +124,28 @@ def _gfpgan(input_frames_dir):
         return Result(success=False, error=f"Error during restore: {e}")
 
 
-def _merge_frames_into_vid(input_video, vid_name):
+
+TMP_OUT_DIR = "results/tmp_vids"
+
+
+def _get_out_vid_path(vid_name):
+    return os.path.join(TMP_OUT_DIR, f"{vid_name}.mp4")
+
+
+def _merge_frames_into_vid(audio_ref_video, vid_name):
+    try:
+        os.makedirs(TMP_OUT_DIR, exist_ok=True)
+        output_video = _get_out_vid_path(vid_name)
+        vid_helper.merge_frames("results/restored_imgs", audio_ref_video, output_video)
+        return Result(data=output_video)
+    except subprocess.CalledProcessError as e:
+        return Result(success=False, data=f"Error during _merge_frames_into_vid: {e}")
+
+
+def _merge_frames_into_vid_ffmpeg(input_video, vid_name):
     input_pattern = "results/restored_imgs/frame%08d.jpg"
-    out_dir = "results/tmp_vids"
-    os.makedirs(out_dir, exist_ok=True)
-    output_video = os.path.join(out_dir, f"{vid_name}.mp4")
+    os.makedirs(TMP_OUT_DIR, exist_ok=True)
+    output_video = _get_out_vid_path(vid_name)
 
     ffmpeg_command = [
         'ffmpeg',

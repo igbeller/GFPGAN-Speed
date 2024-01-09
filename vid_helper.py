@@ -1,4 +1,5 @@
 import cv2
+import os
 
 def extract_frames(input_video, output_folder, target_fps=None):
     cap = cv2.VideoCapture(input_video)
@@ -33,6 +34,19 @@ def extract_frames(input_video, output_folder, target_fps=None):
 
 
 
+def merge_frames(img_folder, audio_file, output_file, fps=30, img_format="jpg"):
+    import imageio
+    from moviepy.editor import ImageSequenceClip, AudioFileClip
+    filex = f".{img_format}"
+    images = [imageio.v2.imread(os.path.join(img_folder, image)) for image in sorted(os.listdir(img_folder)) if image.endswith(filex)]
+    video_clip = ImageSequenceClip(images, fps=fps)
+    audio_clip = AudioFileClip(audio_file)
+    video_clip = video_clip.set_audio(audio_clip)
+    video_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
+
+
+
 if __name__ == '__main__':
     # extract_frames("original.mp4", "pngs")
+    # merge_frames("pngs", "original.mp4", "merged_pngs_result.mp4")
     pass
