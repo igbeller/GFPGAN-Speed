@@ -92,7 +92,6 @@ def _split_vid_into_frames(input_video):
     ffmpeg_command = [
         'ffmpeg',
         "-hide_banner",
-        "-loglevel", "error",
         '-i', input_video,
         '-qscale:v', '1',
         '-qmin', '1',
@@ -125,7 +124,6 @@ def _merge_frames_into_vid(input_video, vid_name):
     ffmpeg_command = [
         'ffmpeg',
         "-hide_banner",
-        "-loglevel", "error",
         '-framerate', '30',
         '-i', input_pattern,
         '-i', input_video,
