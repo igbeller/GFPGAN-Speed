@@ -1,6 +1,7 @@
 
 import base64
 import os
+import shutil
 import subprocess
 
 tmp_frames_path = "inputs/tmp_frames"
@@ -44,6 +45,10 @@ def run(base_64, vid_path, vid_name="output_vid"):
 
         result = _sanity_check_video(output_vid.data)
         print(f"[GFPGAN] vid sanity check: {result}")
+
+        if result == "Video is valid.":
+            os.makedirs("results/vids", exist_ok=True)
+            shutil.move(output_vid.data, "results/vids")
 
         print(f"[GFPGAN] DONE -> {output_vid}")
         return output_vid.data
@@ -113,7 +118,7 @@ def _gfpgan(input_frames_dir):
 
 def _merge_frames_into_vid(input_video, vid_name):
     input_pattern = "results/restored_imgs/frame%08d.jpg"
-    out_dir = "results/vids"
+    out_dir = "results/tmp_vids"
     os.makedirs(out_dir, exist_ok=True)
     output_video = os.path.join(out_dir, f"{vid_name}.mp4")
 
@@ -156,3 +161,5 @@ def _sanity_check_video(file_path):
         return f"Error running FFmpeg command: {e}"
     except Exception as e:
         return f"An unexpected error occurred: {e}"
+
+
