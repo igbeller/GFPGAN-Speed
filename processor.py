@@ -4,7 +4,7 @@ import os
 import shutil
 import subprocess
 
-tmp_frames_path = "inputs/tmp_frames"
+TMP_FRAMES_DIR = "inputs/tmp_frames"
 restored_imgs_path = "results/restored_imgs"
 
 class Result:
@@ -58,9 +58,9 @@ def run(base_64, vid_path, vid_name="output_vid"):
 
 
 def _delete_tmp():
-    _delete_contents(tmp_frames_path)
+    _delete_contents(TMP_FRAMES_DIR)
     _delete_contents(restored_imgs_path)
-    os.makedirs(tmp_frames_path, exist_ok=True)
+    os.makedirs(TMP_FRAMES_DIR, exist_ok=True)
     os.makedirs(restored_imgs_path, exist_ok=True)
 
 def _delete_contents(directory_path):
@@ -84,7 +84,6 @@ def _decode_b64(base_64, out_path):
         return Result(success=False, error=f"Error during _decode_b64: {e}")
 
 
-TMP_FRAMES_DIR = "inputs/tmp_frames"
 def _split_vid_into_frames(input_video):
     try:
         import extract_frames
