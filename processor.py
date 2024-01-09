@@ -136,7 +136,7 @@ def _merge_frames_into_vid(audio_ref_video, vid_name):
     try:
         os.makedirs(TMP_OUT_DIR, exist_ok=True)
         output_video = _get_out_vid_path(vid_name)
-        vid_helper.merge_frames("results/restored_imgs", audio_ref_video, output_video)
+        vid_helper.merge_frames_opencv("results/restored_imgs", audio_ref_video, output_video)
         return Result(data=output_video)
     except subprocess.CalledProcessError as e:
         return Result(success=False, data=f"Error during _merge_frames_into_vid: {e}")
