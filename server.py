@@ -139,7 +139,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 return {
                         KEY_ID: gan_id,
                         "base64": base64str,
-                        "restored_frame": _get_restored_img()
+                        # "restored_frame": _get_restored_img()
                     }
 
     def _err(self, content):
