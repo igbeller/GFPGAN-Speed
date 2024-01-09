@@ -84,10 +84,20 @@ def _decode_b64(base_64, out_path):
         return Result(success=False, error=f"Error during _decode_b64: {e}")
 
 
-
-
+TMP_FRAMES_DIR = "inputs/tmp_frames"
 def _split_vid_into_frames(input_video):
-    out_dir = "inputs/tmp_frames"
+    try:
+        import extract_frames
+        out_folder = extract_frames.extract_frames(input_video, TMP_FRAMES_DIR, target_fps=30)
+        if out_folder is None:
+            return Result(success=False, error=f"_split_vid_into_frames: couldn't open video file")
+        return Result(data=out_folder)
+    except Exception as e:
+        return Result(success=False, error=f"Error during _split_vid_into_frames: {e}")
+
+
+def _split_vid_into_frames_ffmpeg(input_video):
+    out_dir = TMP_FRAMES_DIR
     output_pattern = f"{out_dir}/frame%08d.jpg"
     ffmpeg_command = [
         'ffmpeg',
