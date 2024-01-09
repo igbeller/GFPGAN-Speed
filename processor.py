@@ -123,7 +123,6 @@ def _merge_frames_into_vid(input_video, vid_name):
 
     ffmpeg_command = [
         'ffmpeg',
-        "-hide_banner",
         '-framerate', '30',
         '-i', input_pattern,
         '-i', input_video,
