@@ -71,7 +71,7 @@ def merge_frames_opencv(img_folder, audio_file, output_file, fps=30, img_format=
 
 
 if __name__ == '__main__':
-    os.makedirs("pngs", exist_ok=True)
+    # os.makedirs("pngs", exist_ok=True)
     # extract_frames("original.mp4", "pngs")
-    merge_frames_opencv("pngs", "original.mp4", "merged_pngs_result.mp4")
+    # merge_frames_opencv("pngs", "original.mp4", "merged_pngs_result.mp4")
     pass
