@@ -67,13 +67,13 @@ def _write_error_to_file(error_message, err_file_path):
         print(f"Failed to write to error file {err_file_path}: {e}")
 
 
-def _video_to_base64(file_path):
+def _file_to_urlsafe_base64(file_path):
     try:
-        with open(file_path, 'rb') as video_file:
-            video_binary = video_file.read()
-            print(f"_video_to_base64 {file_path} -> video_binary len: {len(video_binary)}")
-            base64_encoded = base64.urlsafe_b64encode(video_binary)
-            print(f"_video_to_base64 {file_path} -> encoded bytes len: {len(base64_encoded)}")
+        with open(file_path, 'rb') as file:
+            file_binary = file.read()
+            print(f"_file_to_urlsafe_base64 {file_path} -> binary len: {len(file_binary)}")
+            base64_encoded = base64.urlsafe_b64encode(file_binary)
+            print(f"_file_to_urlsafe_base64 {file_path} -> encoded bytes len: {len(base64_encoded)}")
             return base64_encoded.decode(ENCODING)
     except Exception as e:
         print(f"Error: {e}")
@@ -132,16 +132,26 @@ class RequestHandler(BaseHTTPRequestHandler):
         if not os.path.exists(file_path):
             return {KEY_ID: gan_id}
         else:
-            base64str = _video_to_base64(file_path)
+            base64str = _file_to_urlsafe_base64(file_path)
             if "ERROR" in base64str:
                 return {KEY_ID: gan_id, "error": base64str}
             else:
-                return {KEY_ID: gan_id, "base64": base64str}
+                return {
+                        KEY_ID: gan_id,
+                        "base64": base64str,
+                        "restored_frame": _get_restored_img()
+                    }
 
     def _err(self, content):
         return {"error": content}
 
 
+def _get_restored_img():
+    path = "results/restored_imgs/frame00000005.jpg"
+    if os.path.exists(path):
+        return _file_to_urlsafe_base64(path)
+    else:
+        return None
 
 def start_server(server_queue):
     server_address = ('127.0.0.1', 8080)
